@@ -1,2 +1,5 @@
 *.old.go
 *.txt
+*.pdf
+.gitignore
+test.md

@@ -7,11 +7,12 @@ Will detect:
 - Domain Names: Suspicious or malicious domain names.
 - URLs: Suspicious or known malicious URLs.
 - Email Addresses: Suspicious or known malicious email addresses.
+from a file
 
-MD5
-SHA1
-SHA256
-IPv4
-Domain
-URL
-Email address
+It will then create links for public CTI services accordingly to the detected IoC type
+
+## Usage
+
+```sh
+go run main.go iocs.txt
+```

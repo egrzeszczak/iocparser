@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"regexp"
 	"sort"
@@ -12,6 +14,18 @@ type IoC struct {
 	Value string
 	Type  string
 	Raw   string
+}
+
+// Config structure to hold the cti.conf data
+type Config struct {
+	MD5     []string `json:"MD5"`
+	SHA1    []string `json:"SHA1"`
+	SHA256  []string `json:"SHA256"`
+	IPv4    []string `json:"IPv4"`
+	Domain  []string `json:"Domain"`
+	URL     []string `json:"URL"`
+	Email   []string `json:"Email"`
+	Unknown []string `json:"Unknown"`
 }
 
 // readIoCFromFile reads lines from a file and returns them as a slice.
@@ -126,6 +140,38 @@ func detectIoCTypes(lines []string) []IoC {
 	return iocs
 }
 
+// createLinks creates links based on IoC type and URLs from the cti.conf file.
+func createLinks(ioc IoC, config Config) []string {
+	var links []string
+
+	switch ioc.Type {
+	case "MD5":
+		links = config.MD5
+	case "SHA1":
+		links = config.SHA1
+	case "SHA256":
+		links = config.SHA256
+	case "IPv4":
+		links = config.IPv4
+	case "Domain":
+		links = config.Domain
+	case "URL":
+		links = config.URL
+	}
+
+	// Create links by concatenating the URL from cti.conf with the IoC value.
+	var result []string
+	for _, link := range links {
+		if ioc.Type == "URL" {
+			result = append(result, link+url.QueryEscape(ioc.Value))
+		} else {
+			result = append(result, link+ioc.Value)
+		}
+	}
+
+	return result
+}
+
 func main() {
 	// Check if the correct number of command-line arguments is provided.
 	if len(os.Args) != 2 {
@@ -140,6 +186,22 @@ func main() {
 	lines, err := readIoCFromFile(filePath)
 	if err != nil {
 		fmt.Println("Error:", err)
+		return
+	}
+
+	// Read and parse the cti.conf file.
+	configFile, err := os.Open("cti.conf")
+	if err != nil {
+		fmt.Println("Error opening cti.conf:", err)
+		return
+	}
+	defer configFile.Close()
+
+	var config Config
+	decoder := json.NewDecoder(configFile)
+	err = decoder.Decode(&config)
+	if err != nil {
+		fmt.Println("Error parsing cti.conf:", err)
 		return
 	}
 
@@ -177,8 +239,16 @@ func main() {
 			sort.Strings(sortedIoCs)
 
 			// Print the IoCs.
+			fmt.Printf("## %s\n\n", t)
 			for _, ioc := range sortedIoCs {
-				fmt.Printf("(%s) %s\n", t, ioc)
+				fmt.Printf("- (%s) `%s`\n", t, ioc)
+				// Create links for each IoC value.
+				links := createLinks(IoC{Value: ioc, Type: t}, config)
+
+				for _, link := range links {
+					fmt.Printf("  - <%s>\n", link)
+				}
+				fmt.Println()
 			}
 			fmt.Println() // Add a blank line between groups.
 		}
