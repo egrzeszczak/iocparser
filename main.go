@@ -16,20 +16,18 @@ type IoC struct {
 	Raw   string
 }
 
-// Config structure to hold the cti.conf data
-type Config struct {
-	MD5     []string `json:"MD5"`
-	SHA1    []string `json:"SHA1"`
-	SHA256  []string `json:"SHA256"`
-	IPv4    []string `json:"IPv4"`
-	Domain  []string `json:"Domain"`
-	URL     []string `json:"URL"`
-	Email   []string `json:"Email"`
-	Unknown []string `json:"Unknown"`
+type Link struct {
+	Name string
+	URL  string
 }
 
-// readIoCFromFile reads lines from a file and returns them as a slice.
-func readIoCFromFile(filePath string) ([]string, error) {
+type Config struct {
+	Services map[string]struct {
+		Links map[string][]string `json:"Links"`
+	} `json:"Services"`
+}
+
+func readIoCsFromFile(filePath string) ([]string, error) {
 	// Check if the file exists.
 	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
@@ -60,8 +58,7 @@ func readIoCFromFile(filePath string) ([]string, error) {
 	return lines, nil
 }
 
-// detectIoCTypes is a function for detecting IoC types and returns them as a slice of IoC structs.
-func detectIoCTypes(lines []string) []IoC {
+func detectIoCs(lines []string) []IoC {
 	var iocs []IoC
 
 	// Define regular expressions to match URLs, IPv4 addresses, domains, SHA1, SHA256, MD5, and email addresses.
@@ -79,8 +76,6 @@ func detectIoCTypes(lines []string) []IoC {
 	emailRegex := regexp.MustCompile(emailPattern)
 	domainPattern := `[\w\.-]+\.[a-zA-Z]{2,}`
 	domainRegex := regexp.MustCompile(domainPattern)
-	emailDomainPattern := `@([\w\.-]+\.[a-zA-Z]{2,})`
-	emailDomainRegex := regexp.MustCompile(emailDomainPattern)
 
 	// Loop through lines and check for IoCs.
 	for _, line := range lines {
@@ -123,7 +118,7 @@ func detectIoCTypes(lines []string) []IoC {
 			iocs = append(iocs, IoC{Value: line, Type: "Email", Raw: line})
 
 			// Extract Domains from the URL
-			domainMatch := emailDomainRegex.FindStringSubmatch(line)
+			domainMatch := domainRegex.FindStringSubmatch(line)
 			if len(domainMatch) > 1 {
 				iocs = append(iocs, IoC{Value: domainMatch[1], Type: "Domain", Raw: line})
 			}
@@ -140,76 +135,10 @@ func detectIoCTypes(lines []string) []IoC {
 	return iocs
 }
 
-// createLinks creates links based on IoC type and URLs from the cti.conf file.
-func createLinks(ioc IoC, config Config) []string {
-	var links []string
-
-	switch ioc.Type {
-	case "MD5":
-		links = config.MD5
-	case "SHA1":
-		links = config.SHA1
-	case "SHA256":
-		links = config.SHA256
-	case "IPv4":
-		links = config.IPv4
-	case "Domain":
-		links = config.Domain
-	case "URL":
-		links = config.URL
-	}
-
-	// Create links by concatenating the URL from cti.conf with the IoC value.
-	var result []string
-	for _, link := range links {
-		if ioc.Type == "URL" {
-			result = append(result, link+url.QueryEscape(ioc.Value))
-		} else {
-			result = append(result, link+ioc.Value)
-		}
-	}
-
-	return result
-}
-
-func main() {
-	// Check if the correct number of command-line arguments is provided.
-	if len(os.Args) != 2 {
-		fmt.Println("Usage: go run main.go <file_path>")
-		return
-	}
-
-	// Retrieve the file path from the command-line argument.
-	filePath := os.Args[1]
-
-	// Read lines from the file using the readIoCFromFile function.
-	lines, err := readIoCFromFile(filePath)
-	if err != nil {
-		fmt.Println("Error:", err)
-		return
-	}
-
-	// Read and parse the cti.conf file.
-	configFile, err := os.Open("cti.conf")
-	if err != nil {
-		fmt.Println("Error opening cti.conf:", err)
-		return
-	}
-	defer configFile.Close()
-
-	var config Config
-	decoder := json.NewDecoder(configFile)
-	err = decoder.Decode(&config)
-	if err != nil {
-		fmt.Println("Error parsing cti.conf:", err)
-		return
-	}
-
+// Print IoCs to Markdown style function
+func printIoCsToMarkdown(iocs []IoC, config Config) {
 	// Create a map to store grouped and unique IoCs by Type.
 	groupedUniqueIoCs := make(map[string]map[string]struct{})
-
-	// Detect IoC types and group them by Type while ensuring uniqueness.
-	iocs := detectIoCTypes(lines)
 	var typeOrder []string
 
 	for _, ioc := range iocs {
@@ -241,16 +170,89 @@ func main() {
 			// Print the IoCs.
 			fmt.Printf("## %s\n\n", t)
 			for _, ioc := range sortedIoCs {
-				fmt.Printf("- (%s) `%s`\n", t, ioc)
+				fmt.Printf("- `%s`\n", ioc)
 				// Create links for each IoC value.
-				links := createLinks(IoC{Value: ioc, Type: t}, config)
+				links := createIoCLinks(IoC{Value: ioc, Type: t}, config)
 
+				fmt.Printf("\n\t - Check on: ")
 				for _, link := range links {
-					fmt.Printf("  - <%s>\n", link)
+					fmt.Printf("[%s](%s), ", link.Name, link.URL)
 				}
 				fmt.Println()
 			}
 			fmt.Println() // Add a blank line between groups.
 		}
 	}
+}
+
+func createIoCLinks(ioc IoC, config Config) []Link {
+	var links []Link
+
+	// Iterate through the "Services" map
+	for serviceName, service := range config.Services {
+		// Iterate through the "Links" map for each service
+		for linkName, values := range service.Links {
+			if stringInSlice(ioc.Type, values) {
+				links = append(links, Link{
+					Name: serviceName,
+					URL:  linkName + url.QueryEscape(ioc.Value),
+				})
+			}
+			// // Iterate through the slice of values for each link
+			// for _, value := range values {
+			// 	fmt.Println("    Value:", value)
+			// }
+		}
+	}
+
+	return links
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
+func main() {
+	// Check if the correct number of command-line arguments is provided.
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: go run main.go <file_path>")
+		return
+	}
+
+	// Retrieve the file path from the command-line argument.
+	filePath := os.Args[1]
+
+	// Read lines from the file using the readIoCsFromFile function.
+	lines, err := readIoCsFromFile(filePath)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Read and parse the cti.conf file.
+	configFile, err := os.Open("cti.conf")
+	if err != nil {
+		fmt.Println("Error opening cti.conf:", err)
+		return
+	}
+	defer configFile.Close()
+
+	// Unmarshal the JSON into the Config struct
+	var config Config
+	decoder := json.NewDecoder(configFile)
+	if err := decoder.Decode(&config); err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Detect IoC types and group them by Type while ensuring uniqueness.
+	iocs := detectIoCs(lines)
+
+	// Print IoCs to Markdown style
+	printIoCsToMarkdown(iocs, config)
 }
