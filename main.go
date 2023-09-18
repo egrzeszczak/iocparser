@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"sort"
 )
 
 type IoC struct {
@@ -142,22 +143,39 @@ func main() {
 		return
 	}
 
-	// Create a map to store unique IoC pairs.
-	uniqueIoCs := make(map[string]IoC)
+	// Create a map to store grouped and unique IoCs by Type.
+	groupedUniqueIoCs := make(map[string]map[string]struct{})
 
-	// Detect IoC types and add them to the map.
+	// Detect IoC types and group them by Type while ensuring uniqueness.
 	iocs := detectIoCTypes(lines)
 	for _, ioc := range iocs {
-		// Generate a unique key by combining Type and Value.
-		key := fmt.Sprintf("%s-%s", ioc.Type, ioc.Value)
-		// Check if the IoC is not already in the map before adding it.
-		if _, exists := uniqueIoCs[key]; !exists {
-			uniqueIoCs[key] = ioc
+		// Create a map for each Type if it doesn't exist.
+		if _, exists := groupedUniqueIoCs[ioc.Type]; !exists {
+			groupedUniqueIoCs[ioc.Type] = make(map[string]struct{})
 		}
+
+		// Add the IoC Value to the map to ensure uniqueness.
+		groupedUniqueIoCs[ioc.Type][ioc.Value] = struct{}{}
 	}
 
-	// Print the unique IoC pairs.
-	for _, ioc := range uniqueIoCs {
-		fmt.Printf("(%s)   \t %s\n", ioc.Type, ioc.Value)
+	// Define the order in which you want to print the IoC Types.
+	typeOrder := []string{"IPv4", "Domain", "URL", "SHA1", "SHA256", "MD5", "Email", "Unknown"}
+
+	// Print the grouped, sorted, and unique IoCs.
+	for _, t := range typeOrder {
+		if ioCsOfType, exists := groupedUniqueIoCs[t]; exists {
+			// Sort the IoCs alphabetically.
+			var sortedIoCs []string
+			for ioc := range ioCsOfType {
+				sortedIoCs = append(sortedIoCs, ioc)
+			}
+			sort.Strings(sortedIoCs)
+
+			fmt.Printf("%s:\n", t)
+			for _, ioc := range sortedIoCs {
+				fmt.Printf("%s\n", ioc)
+			}
+			fmt.Println() // Add a blank line between groups.
+		}
 	}
 }
