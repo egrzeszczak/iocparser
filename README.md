@@ -1,18 +1,19 @@
 # iocenhancer
 
-Will detect:
-- File Hashes: MD5, SHA-1, SHA-256 hashes of files known to be malicious.
-- File Names: Suspicious or known malicious filenames.
-- IP Addresses: IP addresses known to be associated with malicious activities.
-- Domain Names: Suspicious or malicious domain names.
-- URLs: Suspicious or known malicious URLs.
-- Email Addresses: Suspicious or known malicious email addresses.
-from a file
+**WARNING!** It is still dangerous to use since the values printed aren't defanged yet. Working on it.
 
-It will then create links for public CTI services accordingly to the detected IoC type
+Will detect:
+- File Hashes: MD5, SHA-1, SHA-256,
+- IPv4 Addresses,
+- Domain Names,
+- URLs,
+- Email Addresses
+
+It will then create links for public CTI services accordingly to the detected IoC type and parse them into a [pretty markdown format](example-output.md).
+
 
 ## Usage
 
 ```sh
-go run main.go iocs.txt
+Usage: go run main.go <file_path>
 ```
