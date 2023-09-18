@@ -148,18 +148,21 @@ func main() {
 
 	// Detect IoC types and group them by Type while ensuring uniqueness.
 	iocs := detectIoCTypes(lines)
+	var typeOrder []string
+
 	for _, ioc := range iocs {
 		// Create a map for each Type if it doesn't exist.
 		if _, exists := groupedUniqueIoCs[ioc.Type]; !exists {
 			groupedUniqueIoCs[ioc.Type] = make(map[string]struct{})
+			typeOrder = append(typeOrder, ioc.Type) // Add the detected Type to typeOrder.
 		}
 
 		// Add the IoC Value to the map to ensure uniqueness.
 		groupedUniqueIoCs[ioc.Type][ioc.Value] = struct{}{}
 	}
 
-	// Define the order in which you want to print the IoC Types.
-	typeOrder := []string{"IPv4", "Domain", "URL", "SHA1", "SHA256", "MD5", "Email", "Unknown"}
+	// Sort the typeOrder slice alphabetically.
+	sort.Strings(typeOrder)
 
 	// Print the grouped, sorted, and unique IoCs.
 	for _, t := range typeOrder {
