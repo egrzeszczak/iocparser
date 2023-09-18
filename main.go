@@ -177,9 +177,8 @@ func main() {
 			sort.Strings(sortedIoCs)
 
 			// Print the IoCs.
-			fmt.Printf("%s:\n", t)
 			for _, ioc := range sortedIoCs {
-				fmt.Printf("%s\n", ioc)
+				fmt.Printf("(%s) %s\n", t, ioc)
 			}
 			fmt.Println() // Add a blank line between groups.
 		}
