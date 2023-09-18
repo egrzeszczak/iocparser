@@ -167,13 +167,16 @@ func main() {
 	// Print the grouped, sorted, and unique IoCs.
 	for _, t := range typeOrder {
 		if ioCsOfType, exists := groupedUniqueIoCs[t]; exists {
-			// Sort the IoCs alphabetically.
+			// Collect the IoCs for this type.
 			var sortedIoCs []string
 			for ioc := range ioCsOfType {
 				sortedIoCs = append(sortedIoCs, ioc)
 			}
+
+			// Sort the IoCs alphabetically.
 			sort.Strings(sortedIoCs)
 
+			// Print the IoCs.
 			fmt.Printf("%s:\n", t)
 			for _, ioc := range sortedIoCs {
 				fmt.Printf("%s\n", ioc)
