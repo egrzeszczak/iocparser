@@ -1,3 +1,3 @@
-module ioc-enhancer
+module iocparser
 
 go 1.21.1
