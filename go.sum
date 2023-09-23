@@ -1,0 +1,14 @@
+github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a h1:idn718Q4B6AGu/h5Sxe66HYVdqdGu2l9Iebqhi/AEoA=
+github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a/go.mod h1:lB+ZfQJz7igIIfQNfa7Ml4HSf2uFQQRzpGGRXenZAgY=
+github.com/atotto/clipboard v0.1.2/go.mod h1:ZY9tmq7sm5xIbd9bOK4onWV4S6X0u6GY7Vn0Yu86PYI=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/jakewarren/defang v1.0.9 h1:Ui62+9cnSmo2aQ1QFtQ4PMWAqmGe61rrScGeBTkMgfg=
+github.com/jakewarren/defang v1.0.9/go.mod h1:4Ukaep7vwhfvRHIuJyP3DJ0zc5PtT5Cfx9HTkCSK2TU=
+github.com/jakewarren/tldomains v0.0.0-20190823190803-5e6e110ee186 h1:q82KNGCQJkdhMNxbFWXjmZXrltJ7aSxneBiXzfXFH/w=
+github.com/jakewarren/tldomains v0.0.0-20190823190803-5e6e110ee186/go.mod h1:RbNOyHVSjEwwh5yzO8CdO2ypswgMWJ2Vhr0UP6jOzfM=
+github.com/mingrammer/commonregex v1.0.1/go.mod h1:/HNZq7qReKgXBxJxce5SOxf33y0il/ZqL4Kxgo2NLcA=
+github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
+github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An2Bg=
+github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=

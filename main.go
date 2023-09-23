@@ -16,7 +16,7 @@ func main() {
 	// 2. Read file given in args
 	fileLines, err := reader.Read(filePath)
 	if err != nil {
-		fmt.Errorf("file read: %s", err)
+		fmt.Errorf("Error while reading file: %s", err)
 		return
 	}
 

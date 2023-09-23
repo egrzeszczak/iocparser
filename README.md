@@ -1,19 +1,39 @@
 # iocparser
 
-**WARNING!** It is still dangerous to use since the values printed aren't defanged yet. Working on it.
+A tool for detecting and enriching IoCs.
 
-Will detect:
-- File Hashes: MD5, SHA-1, SHA-256,
-- IPv4 Addresses,
-- Domain Names,
-- URLs,
-- Email Addresses
-
-It will then create links for public CTI services accordingly to the detected IoC type and parse them into a [pretty markdown format](example-output.md).
-
-
-## Usage
+**Usage:**
 
 ```sh
-Usage: go run main.go <file_path>
+go run main.go -i file-with-iocs.txt
 ```
+
+```sh
+go run main.go -i file-with-iocs.txt -o iocs.md -f markdown
+```
+
+```sh
+go run main.go -i file-with-iocs.txt -o iocs.jira -f jira
+```
+
+## 1. Detecting IoCs
+
+`iocparser` will detect:
+
+- MD5, SHA1, SHA256 hashes
+- IPv4 Addresses,
+- Domain Names,
+- Email Addresses,
+- URLs
+
+## 2. Enriching IoCs
+
+`iocparser` will enrich detected IoCs with:
+
+- Links to public reputation services (such as Talos Intelligence, VirusTotal, AbuseIPDB, IBM XForce) 
+
+## 3. Printing and formating IoCs
+
+`iocparser` will print detected and enriched IoCs:
+
+- In a Markdown format (usage: `-f markdown`)
