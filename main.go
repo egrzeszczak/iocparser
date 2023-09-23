@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 
-	detect "github.com/egrzeszczak/iocparser/detect"
-	"github.com/egrzeszczak/iocparser/enrich/reputation"
+	"github.com/egrzeszczak/iocparser/detect/url"
 	"github.com/egrzeszczak/iocparser/input"
 	"github.com/egrzeszczak/iocparser/reader"
 )
@@ -14,21 +13,25 @@ func main() {
 	// 1. Read input args
 	filePath, _, _ := input.GetArgs()
 
-	// 2. Read file given in args
+	// // 2. Read file given in args
 	fileLines, err := reader.Read(filePath)
 	if err != nil {
 		fmt.Errorf("Error while reading file: %s", err)
 		return
 	}
 
-	// 3. Detect IoCs in each line
-	fileIOCs := detect.Detect(fileLines)
-	fmt.Printf("%v", fileIOCs)
-
-	// 4. Create a link to each IoC to a reputation service
-	for _, ioc := range fileIOCs {
-		fmt.Printf("%v", reputation.Create(ioc))
+	for _, fileLine := range fileLines {
+		url.Detect(fileLine)
 	}
+
+	// // 3. Detect IoCs in each line
+	// fileIOCs := detect.Detect(fileLines)
+	// fmt.Printf("%v", fileIOCs)
+
+	// // 4. Create a link to each IoC to a reputation service
+	// for _, ioc := range fileIOCs {
+	// 	fmt.Printf("%v", reputation.Create(ioc))
+	// }
 
 	// 5. Display
 	// WORK IN PROGRESS

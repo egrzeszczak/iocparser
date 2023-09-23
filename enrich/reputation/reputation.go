@@ -137,6 +137,7 @@ func GetConfig() Config {
 	return config
 }
 
+// Creates reputation links for given IoCs
 func Create(ioc detect.IoC) []Link {
 	var links []Link
 
