@@ -1,4 +1,4 @@
-package enhancer
+package reputation
 
 import (
 	"encoding/json"
@@ -23,8 +23,8 @@ type Config struct {
 var config Config
 
 func init() {
-	configContent := `
-	{
+	// Hardcoded cti.conf config
+	configContent := `{
 		"Services": {
 			"VirusTotal": {
 				"Links": {
@@ -137,7 +137,7 @@ func GetConfig() Config {
 	return config
 }
 
-func CreateLinks(ioc detect.IoC) []Link {
+func Create(ioc detect.IoC) []Link {
 	var links []Link
 
 	// Iterate through the "Services" map

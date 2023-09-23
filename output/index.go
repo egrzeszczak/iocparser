@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/egrzeszczak/iocparser/detect"
-	"github.com/egrzeszczak/iocparser/enhancer"
+	"github.com/egrzeszczak/iocparser/enrich/reputation"
 )
 
 // Print IoCs to Markdown style function
@@ -45,7 +45,7 @@ func OutputMarkdown(iocs []detect.IoC) {
 			for _, ioc := range sortedIoCs {
 				fmt.Printf("- `%s`\n", ioc)
 				// Create links for each IoC value.
-				links := enhancer.CreateLinks(detect.IoC{Value: ioc, Type: t})
+				links := reputation.Create(detect.IoC{Value: ioc, Type: t})
 
 				fmt.Printf("\n\t - Check on: ")
 				for _, link := range links {
