@@ -30,10 +30,12 @@ go run main.go -i file-with-iocs.txt -o iocs.jira -f jira
 
 `iocparser` will enrich detected IoCs with:
 
-- Links to public reputation services (such as Talos Intelligence, VirusTotal, AbuseIPDB, IBM XForce) 
+- Links to public reputation services (such as Talos Intelligence, VirusTotal, AbuseIPDB, IBM XForce)
 
 ## 3. Printing and formating IoCs
 
 `iocparser` will print detected and enriched IoCs:
 
 - In a Markdown format (usage: `-f markdown`)
+- As a [Jira wiki text](https://jira.atlassian.com/secure/WikiRendererHelpAction.jspa?section=all) (TODO: Work in progress)
+- As a CSV (TODO: Work in progress)

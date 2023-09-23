@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	detect "github.com/egrzeszczak/iocparser/detect"
+	"github.com/egrzeszczak/iocparser/enhancer"
 	"github.com/egrzeszczak/iocparser/input"
 	"github.com/egrzeszczak/iocparser/reader"
 )
@@ -25,7 +26,9 @@ func main() {
 	fmt.Printf("%v", fileIOCs)
 
 	// 4. Create a link to each IoC to a reputation service
-	// TODO: var fileLinks [][]enhancer.Link
+	for _, ioc := range fileIOCs {
+		fmt.Printf("%v", enhancer.CreateLinks(ioc))
+	}
 
 	// 5. Display
 	// WORK IN PROGRESS

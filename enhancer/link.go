@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"os"
 
 	"github.com/egrzeszczak/iocparser/detect"
 	"github.com/egrzeszczak/iocparser/help"
@@ -24,17 +23,111 @@ type Config struct {
 var config Config
 
 func init() {
-	// Read and parse the cti.conf file.
-	configFile, err := os.Open("cti.conf")
-	if err != nil {
-		fmt.Println("Error opening cti.conf:", err)
-		return
+	configContent := `
+	{
+		"Services": {
+			"VirusTotal": {
+				"Links": {
+					"https://www.virustotal.com/gui/search/": [
+						"MD5", "SHA1", "SHA256"
+					],
+					"https://www.virustotal.com/gui/ip-address/": [
+						"IPv4"
+					],
+					"https://www.virustotal.com/gui/domain/": [
+						"Domain"
+					]
+				}
+			},
+			"Talos": {
+				"Links": {
+					"https://www.talosintelligence.com/reputation_center/lookup?search=": [
+						"Domain", "IPv4", "Email"
+					]
+				}
+			},
+			"XForce": {
+				"Links": {
+					"https://exchange.xforce.ibmcloud.com/url/": [
+						"URL"
+					],
+					"https://exchange.xforce.ibmcloud.com/ip/": [
+						"IPv4"
+					],
+					"https://exchange.xforce.ibmcloud.com/malware/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"URLHaus": {
+				"Links": {
+					"https://urlhaus.abuse.ch/browse.php?search=": [
+						"URL"
+					]
+				}
+			},
+			"AbuseIPDB": {
+				"Links": {
+					"https://www.abuseipdb.com/check/": [
+						"IPv4", "Domain"
+					]
+				}
+			},
+			"InQuest": {
+				"Links": {
+					"https://labs.inquest.net/search/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"Bazaar": {
+				"Links": {
+					"https://bazaar.abuse.ch/sample/": [
+						"SHA256"
+					]
+				}
+			},
+			"MWDB CERT": {
+				"Links": {
+					"https://mwdb.cert.pl/sample/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"Hybrid Analysis": {
+				"Links": {
+					"https://www.hybrid-analysis.com/sample/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"Malprob": {
+				"Links": {
+					"https://malprob.io/report/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"AnyRun": {
+				"Links": {
+					"https://app.any.run/submissions/#filehash:": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			},
+			"Yomi": {
+				"Links": {
+					"https://yomi.yoroi.company/submissions/": [
+						"MD5", "SHA1", "SHA256"
+					]
+				}
+			}
+		}
 	}
-	defer configFile.Close()
+	`
 
-	// Unmarshal the JSON into the Config struct
-	decoder := json.NewDecoder(configFile)
-	if err := decoder.Decode(&config); err != nil {
+	// Unmarshal the JSON content into the Config struct
+	if err := json.Unmarshal([]byte(configContent), &config); err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
