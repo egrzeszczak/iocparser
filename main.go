@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/egrzeszczak/iocparser/detect/url"
+	"github.com/egrzeszczak/iocparser/detect/ipv4"
 	"github.com/egrzeszczak/iocparser/input"
 	"github.com/egrzeszczak/iocparser/reader"
 )
@@ -21,7 +21,7 @@ func main() {
 	}
 
 	for _, fileLine := range fileLines {
-		url.Detect(fileLine)
+		ipv4.Detect(fileLine)
 	}
 
 	// // 3. Detect IoCs in each line
