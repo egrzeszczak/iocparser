@@ -3,7 +3,12 @@ package main
 import (
 	"fmt"
 
+	"github.com/egrzeszczak/iocparser/detect"
 	"github.com/egrzeszczak/iocparser/detect/ipv4"
+	"github.com/egrzeszczak/iocparser/detect/md5"
+	"github.com/egrzeszczak/iocparser/detect/sha1"
+	"github.com/egrzeszczak/iocparser/detect/sha256"
+	"github.com/egrzeszczak/iocparser/detect/url"
 	"github.com/egrzeszczak/iocparser/input"
 	"github.com/egrzeszczak/iocparser/reader"
 )
@@ -20,32 +25,49 @@ func main() {
 		return
 	}
 
+	var IoCs []detect.IoC
+
 	for _, fileLine := range fileLines {
-		ipv4.Detect(fileLine)
+
+		DetectedURL, _ := url.Detect(fileLine)
+		if (DetectedURL != url.URL{}) {
+			IoCs = append(IoCs, detect.IoC{
+				Value: DetectedURL,
+			})
+		}
+
+		DetectedSHA256, _ := sha256.Detect(fileLine)
+		if (DetectedSHA256 != sha256.SHA256{}) {
+			IoCs = append(IoCs, detect.IoC{
+				Value: DetectedSHA256,
+			})
+		}
+
+		DetectedSHA1, _ := sha1.Detect(fileLine)
+		if (DetectedSHA1 != sha1.SHA1{}) {
+			IoCs = append(IoCs, detect.IoC{
+				Value: DetectedSHA1,
+			})
+		}
+
+		DetectedMD5, _ := md5.Detect(fileLine)
+		if (DetectedMD5 != md5.MD5{}) {
+			IoCs = append(IoCs, detect.IoC{
+				Value: DetectedMD5,
+			})
+		}
+
+		DetectedIPv4, _ := ipv4.Detect(fileLine)
+		if (DetectedIPv4 != ipv4.IPv4{}) {
+			IoCs = append(IoCs, detect.IoC{
+				Value: DetectedIPv4,
+			})
+		}
+
 	}
 
-	// // 3. Detect IoCs in each line
-	// fileIOCs := detect.Detect(fileLines)
-	// fmt.Printf("%v", fileIOCs)
+	for _, ioc := range IoCs {
+		fmt.Printf("%T, %s\n\n", ioc.Value, ioc.Value)
+	}
 
-	// // 4. Create a link to each IoC to a reputation service
-	// for _, ioc := range fileIOCs {
-	// 	fmt.Printf("%v", reputation.Create(ioc))
-	// }
-
-	// 5. Display
-	// WORK IN PROGRESS
-
-	// // Read lines from the file using the readIoCsFromFile function.
-	// lines, err := readIoCsFromFile(filePath)
-	// if err != nil {
-	// 	fmt.Println("Error:", err)
-	// 	return
-	// }
-
-	// // Detect IoC types and group them by Type while ensuring uniqueness.
-	// iocs := detectIoCs(lines)
-
-	// // Print IoCs to Markdown style
-	// printIoCsToMarkdown(iocs, config)
 }
